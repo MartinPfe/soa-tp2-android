@@ -8,6 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.tp2_grupo4.MainActivity;
 import com.example.tp2_grupo4.R;
 import com.example.tp2_grupo4.helpers.FingerprintHandler;
 import com.example.tp2_grupo4.ui.login.LoginActivity;
@@ -52,6 +53,17 @@ public class AuthActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
+
+
+        Button authButton = (Button)findViewById(R.id.validateAuth);
+
+        authButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // If you’ve set your app’s minSdkVersion to anything lower than 23, then you’ll need to verify that the device is running Marshmallow
         // or higher before executing any fingerprint-related code
