@@ -4,7 +4,11 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_username">Usuario</string>
     <string name="prompt_password">Contraseña</string>
-    <string name="action_sign_in">Iniciar sesión o registrarse</string>
+    <string name="prompt_name">Nombre</string>
+    <string name="prompt_lastname">Apellido</string>
+    <string name="prompt_dni">DNI</string>
+    <string name="action_sign_in">Iniciar sesión</string>
+    <string name="action_sign_up">Registrarse</string>
     <string name="action_auth">Continuar a la APP</string>
     <string name="action_sign_in_short">Iniciar sesion</string>
     <string name="welcome">"Bienvenido!"</string>
