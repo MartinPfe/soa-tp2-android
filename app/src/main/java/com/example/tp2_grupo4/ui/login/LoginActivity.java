@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 i.putExtra("uri", registerUri);
                 i.putExtra("jsonData", objRegister.toString());
-                i.putExtra("receiver", "RESPUESTA_LOOGIN");
+                i.putExtra("receiver", "RESPUESTA_LOGIN");
 
                 Log.e("1", "Antes de llamar");
 
@@ -209,7 +209,7 @@ public class LoginActivity extends AppCompatActivity {
         registerReceiver(receiverRegistro, filtroRegistro);
 
         filtroLogin = new IntentFilter("com.example.intentservice.intent.action.RESPUESTA_LOGIN");
-        filtroLogin.addCategory(Intent.CATEGORY_ALTERNATIVE);
+        filtroLogin.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(receiverLogin, filtroLogin);
     }
 
