@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         displayCountryInfoText = findViewById(R.id.displayCountryInfo);
         covidCasesTextView = findViewById(R.id.covidCasesTextView);
 
-        //registerEvent("Login", "Un usuario inicio sesion");
+        registerEvent("Login", "Un usuario inicio sesion");
 
         getCountryButton.setOnClickListener(new View.OnClickListener() {
             @Override

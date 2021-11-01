@@ -59,28 +59,46 @@ public class EventsService extends IntentService
 
     protected String obtenerToken(String email)
     {
-        return "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzU3MjQ0NDMsInR5cGUiOiJpbmljaWFsIiwidXNlciI6eyJlbWFpbCI6Im1hcnRpbi5wZmVAZ21haWwuY29tIiwiZG5pIjoiMzkxNjY2NjgiLCJncm91cCI6NH19.MWjQjJCdZ-M20-RqJZXvFLCW5BP26Gj0F0BSq7bx0RE";
+        //TODO: Deshardcodear esto y hacer que lo tenga de la DB
+        String refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzU4MDY4OTgsInR5cGUiOiJyZWZyZXNoIiwidXNlciI6eyJlbWFpbCI6Im1hcnRpbi5wZmVAZ21haWwuY29tIiwiZG5pIjozOTE2NjY2OCwiZ3JvdXAiOjR9fQ.odxTg_in1m33CLmTRHQrYyZc3rLo_DF5toqRZR5fz7g";
+        String token = "";
+
+        String response = PUT(refreshTokenUri, "", refreshToken);
+        //TODO: Cambiar esto para que haga la validación de ver si está vencido
+        Boolean tokenVencido = true;
+
+        if(tokenVencido) {
+            if (response != "NO_OK") {
+                try {
+                    JSONObject responseJson = new JSONObject(response);
+
+                    //TODO: Guardar el token
+                    token = responseJson.getString("token");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return token;
     }
 
+    //Esto correspondería tenerlo en un httpClient distintos. Para hacerlo mas rápido lo dejo acá por el momento
     private String PUT (String uri, String jsonData, String refreshToken)
     {
         HttpURLConnection urlConnection = null;
         try
         {
-            //Se alamacena la URI del request del servicio web
             URL mUrl = new URL(uri);
 
             urlConnection = (HttpURLConnection) mUrl.openConnection();
-            urlConnection.setDoOutput(true);
-            urlConnection.setDoInput(true);
             urlConnection.setRequestMethod("PUT");
             urlConnection.setRequestProperty("Content-Type", "application/json");
 
             urlConnection.setRequestProperty("Authorization", "Bearer " + refreshToken);
 
             DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream ());
-
-            JSONObject obj = new JSONObject();
 
             wr.writeBytes(jsonData);
 
@@ -93,7 +111,7 @@ public class EventsService extends IntentService
 
             String result = "";
 
-            if ( responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED)
+            if ( responseCode == HttpURLConnection.HTTP_OK)
             {
                 InputStreamReader inputStreamReader = new InputStreamReader((urlConnection.getInputStream()));
                 result = convertInputStreamToString(inputStreamReader);
@@ -112,7 +130,8 @@ public class EventsService extends IntentService
 
             return result;
 
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
