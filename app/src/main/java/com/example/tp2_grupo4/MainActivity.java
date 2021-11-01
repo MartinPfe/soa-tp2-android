@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -30,11 +31,14 @@ public class MainActivity extends AppCompatActivity {
     private String covid19Uri = "https://api.covid19api.com/";
     public IntentFilter filtroPaises;
     public IntentFilter filtroCasos;
+    public IntentFilter filtroBateria;
     private ReceptorOperacionTraerPais receiverPaises = new ReceptorOperacionTraerPais();
     private ReceptorOperacionTraerCasos receiverCasos = new ReceptorOperacionTraerCasos();
+    private ReceptorBateria receiverBateria = new ReceptorBateria();
 
     public TextView displayCountryInfoText;
     public TextView covidCasesTextView;
+    public TextView batteryLvlTextView;
 
     public Country currentCountry;
 
@@ -42,13 +46,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        configurarBroadcastReceiver();
 
         final Button getCountryButton = findViewById(R.id.getCountryButton);
         displayCountryInfoText = findViewById(R.id.displayCountryInfo);
         covidCasesTextView = findViewById(R.id.covidCasesTextView);
+        batteryLvlTextView = findViewById(R.id.batteryLvlTextView);
 
-        registerEvent("Login", "Un usuario inicio sesion");
+        configurarBroadcastReceiver();
+
+        //registerEvent("Login", "Un usuario inicio sesion");
 
         getCountryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         startService(i);
     }
 
-
     protected void registerEvent(String type, String description){
         Intent i = new Intent(MainActivity.this, EventsService.class);
 
@@ -114,7 +119,23 @@ public class MainActivity extends AppCompatActivity {
         filtroCasos = new IntentFilter("com.example.intentservice.intent.action.RESPUESTA_CASOS");
         filtroCasos.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(receiverCasos, filtroCasos);
+
+        filtroBateria = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        filtroBateria.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiverBateria, filtroBateria);
     }
+
+
+    public class ReceptorBateria extends BroadcastReceiver
+    {
+        public void onReceive(Context context, Intent intent) {
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            float battery = level * 100 / (float)scale;
+            batteryLvlTextView.setText(String.valueOf(battery) + "%");
+        }
+    }
+
 
     public class ReceptorOperacionTraerPais extends BroadcastReceiver
     {

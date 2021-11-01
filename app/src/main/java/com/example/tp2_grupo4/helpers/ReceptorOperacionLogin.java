@@ -10,6 +10,7 @@ import com.example.tp2_grupo4.MainActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+//Estos broadcastReceiver podrían haber estados metidos adentro de las clases donde se usan
 public class ReceptorOperacionLogin extends BroadcastReceiver
 {
     public void onReceive(Context context, Intent intent) {
