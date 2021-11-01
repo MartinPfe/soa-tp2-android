@@ -37,6 +37,8 @@
 
         <service android:name=".HttpClient.HttpCliente_POST" >
         </service>
+        <service android:name=".HttpClient.HttpClient_GET" >
+        </service>
         <service android:name=".services.EventsService" >
         </service>
     </application>

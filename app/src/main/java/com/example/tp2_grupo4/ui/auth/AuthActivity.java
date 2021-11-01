@@ -38,7 +38,6 @@ import javax.crypto.SecretKey;
 
 public class AuthActivity  extends AppCompatActivity {
 
-
     // Declare a string variable for the key we’re going to use in our fingerprint authentication
     private static final String KEY_NAME = "yourKey";
     private Cipher cipher;
@@ -53,7 +52,6 @@ public class AuthActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-
 
         Button authButton = (Button)findViewById(R.id.validateAuth);
 
