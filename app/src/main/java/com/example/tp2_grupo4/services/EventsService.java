@@ -1,11 +1,15 @@
-package com.example.tp2_grupo4.HttpClient;
+package com.example.tp2_grupo4.services;
 
-import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
+import com.example.tp2_grupo4.HttpClient.HttpCliente_POST;
+import com.example.tp2_grupo4.ui.login.LoginActivity;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -15,55 +19,64 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
-
-public class HttpCliente_POST extends IntentService
+public class EventsService extends IntentService
 {
     private Exception mException=null;
 
-    public HttpCliente_POST() {
-        super("HttpCliente_POST");
+    private String eventsUri = "http://so-unlam.net.ar/api/api/event";
+    private String refreshTokenUri = "http://so-unlam.net.ar/api/api/refresh";
+
+    public EventsService() {
+        super("EventsService");
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
-        String uri = intent.getExtras().getString("uri");
-        String datosJson = intent.getExtras().getString("jsonData");
-        String receiver = intent.getExtras().getString("receiver");
-        String token = intent.getExtras().getString("token");
+    protected void onHandleIntent(@Nullable Intent intent) {
+        String email = intent.getExtras().getString("email");
+        String type = intent.getExtras().getString("type");
+        String description = intent.getExtras().getString("description");
 
-        ejecutarPost(uri, datosJson, receiver, token);
+        Intent i = new Intent(EventsService.this, HttpCliente_POST.class);
+
+        JSONObject objEvent = new JSONObject();
+        try {
+            objEvent.put("type_events", type);
+            objEvent.put("description", description);
+            //TODO: Cambiar por variables de entorno
+            objEvent.put("env", "TEST");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        i.putExtra("uri", eventsUri);
+        i.putExtra("jsonData", objEvent.toString());
+        i.putExtra("receiver", "RESPUESTA_EVENTO");
+        i.putExtra("token", obtenerToken(email));
+
+        startService(i);
     }
 
-    protected void ejecutarPost(String uri, String datosJson, String receiver, String token)
+    protected String obtenerToken(String email)
     {
-        String result = POST(uri, datosJson, token);
-
-        Intent i = new Intent("com.example.intentservice.intent.action." + receiver);
-        i.putExtra("datosJson", result);
-
-        sendBroadcast(i);
+        return "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzU3MjQ0NDMsInR5cGUiOiJpbmljaWFsIiwidXNlciI6eyJlbWFpbCI6Im1hcnRpbi5wZmVAZ21haWwuY29tIiwiZG5pIjoiMzkxNjY2NjgiLCJncm91cCI6NH19.MWjQjJCdZ-M20-RqJZXvFLCW5BP26Gj0F0BSq7bx0RE";
     }
 
-
-    private String POST (String uri, String jsonData, String token)
+    private String PUT (String uri, String jsonData, String refreshToken)
     {
         HttpURLConnection urlConnection = null;
         try
         {
+            //Se alamacena la URI del request del servicio web
             URL mUrl = new URL(uri);
 
             urlConnection = (HttpURLConnection) mUrl.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
-            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestMethod("PUT");
             urlConnection.setRequestProperty("Content-Type", "application/json");
 
-            if(token != null && token.length() > 0)
-            {
-                urlConnection.setRequestProperty("Authorization", "Bearer " + token);
-            }
+            urlConnection.setRequestProperty("Authorization", "Bearer " + refreshToken);
 
             DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream ());
 
@@ -123,4 +136,5 @@ public class HttpCliente_POST extends IntentService
         }
         return resultString;
     }
+
 }
