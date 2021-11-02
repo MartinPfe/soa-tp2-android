@@ -4,13 +4,9 @@ public class Country {
     String name;
     String slug;
 
-
-    int infectedQty;
-
-    public Country(String name, String slu, int infectedQty) {
+    public Country(String name, String slug) {
         this.name = name;
         this.slug = slug;
-        this.infectedQty = infectedQty;
     }
 
     public void setName(String name) {
@@ -26,6 +22,4 @@ public class Country {
         return slug;
     }
 
-    public int getInfectedQty() { return infectedQty; }
-    public void setInfectedQty(int infectedQty) { this.infectedQty = infectedQty; }
 }

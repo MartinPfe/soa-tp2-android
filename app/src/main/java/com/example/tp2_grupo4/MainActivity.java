@@ -19,6 +19,7 @@ import com.example.tp2_grupo4.data.DbRepository;
 import com.example.tp2_grupo4.data.model.Country;
 import com.example.tp2_grupo4.data.model.User;
 import com.example.tp2_grupo4.services.EventsService;
+import com.example.tp2_grupo4.ui.metrics.MetricsActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
         covidCasesTextView = findViewById(R.id.covidCasesTextView);
         batteryLvlTextView = findViewById(R.id.batteryLvlTextView);
 
+        final Button btnMetrics = findViewById(R.id.btnMetrics);
+
+
+
         configurarBroadcastReceiver();
 
         //registerEvent("Login", "Un usuario inicio sesion");
@@ -71,6 +76,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getRandomCountry();
+            }
+        });
+
+        btnMetrics.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MetricsActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -118,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected String getLoggedUserEmail(){
         //TODO: sacarlo cuando tengamos el login activo
-//        db.insertUser("noidz@gmail.com", "refreshToken","accessToken");
+        db.insertUser("noidz@gmail.com", "refreshToken","accessToken");
 
         return loggedInUser.email != null ? loggedInUser.email : "martin.pfe@gmail.com";
     }
@@ -166,9 +179,9 @@ public class MainActivity extends AppCompatActivity {
 
                     String countryName = countryJson.getString("Country");
                     String countrySlug = countryJson.getString("Slug");
-                    int countryInfectedQty = Integer.parseInt(countryJson.getString("Active"));
+                    //int countryInfectedQty = Integer.parseInt(countryJson.getString("Active"));
 
-                    currentCountry = new Country(countryName, countrySlug, countryInfectedQty);
+                    currentCountry = new Country(countryName, countrySlug);
 
                     displayCountryInfoText.setText(currentCountry.getName());
 
