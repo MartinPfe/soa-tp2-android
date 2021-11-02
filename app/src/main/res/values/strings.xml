@@ -18,4 +18,8 @@
     <string name="fingerprint_instructions">
     Ingresá la huella digital para continuar a la aplicación
     </string>
+    <string-array name="MetricsParameters">
+        <item>Los países más buscados</item>
+        <item>Los países con menos infectados</item>
+    </string-array>
 </resources>
