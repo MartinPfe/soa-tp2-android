@@ -28,7 +28,7 @@
         android:layout_marginStart="158dp"
         android:layout_marginEnd="160dp"
         android:layout_marginBottom="128dp"
-        android:text="Traer info paisss"
+        android:text="Traer info país"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.558"

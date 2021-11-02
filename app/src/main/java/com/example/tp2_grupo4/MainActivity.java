@@ -125,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiverBateria, filtroBateria);
     }
 
-
     public class ReceptorBateria extends BroadcastReceiver
     {
         public void onReceive(Context context, Intent intent) {
@@ -135,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
             batteryLvlTextView.setText(String.valueOf(battery) + "%");
         }
     }
-
 
     public class ReceptorOperacionTraerPais extends BroadcastReceiver
     {
@@ -162,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
 
                     getCountryCovidStats();
 
-                    Toast.makeText(context, "Llamada hecha correctamente", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -189,8 +186,6 @@ public class MainActivity extends AppCompatActivity {
                     String activeCases = countryJson.getString("Active");
 
                     covidCasesTextView.setText(activeCases);
-
-                    Toast.makeText(context, "Llamada hecha correctamente", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
