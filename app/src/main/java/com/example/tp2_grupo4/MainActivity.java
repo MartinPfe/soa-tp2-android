@@ -55,8 +55,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-         db = new DbRepository(this);
-         loggedInUser = db.getLoggedUser();
+        db = new DbRepository(this);
+
+        loggedInUser = db.getLoggedUser();
 
 
         final Button getCountryButton = findViewById(R.id.getCountryButton);
@@ -130,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected String getLoggedUserEmail(){
-        //TODO: sacarlo cuando tengamos el login activo
-        db.insertUser("noidz@gmail.com", "refreshToken","accessToken");
 
         return loggedInUser.email != null ? loggedInUser.email : "martin.pfe@gmail.com";
     }

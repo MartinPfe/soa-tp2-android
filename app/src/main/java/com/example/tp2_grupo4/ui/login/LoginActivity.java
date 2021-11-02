@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.example.tp2_grupo4.HttpClient.HttpCliente_POST;
 import com.example.tp2_grupo4.MainActivity;
 import com.example.tp2_grupo4.R;
+import com.example.tp2_grupo4.data.DbRepository;
 
 
 import org.json.JSONException;
@@ -43,6 +44,9 @@ public class LoginActivity extends AppCompatActivity {
     private ReceptorOperacionRegistro receiverRegistro = new ReceptorOperacionRegistro();
     private ReceptorOperacionLogin receiverLogin = new ReceptorOperacionLogin();
 
+    DbRepository db;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +59,8 @@ public class LoginActivity extends AppCompatActivity {
         final EditText nameEditText = findViewById(R.id.name);
         final EditText lastNameEditText = findViewById(R.id.lastname);
         final EditText dniEditText = findViewById(R.id.dni);
+
+        db = new DbRepository(this);
 
         configurarBroadcastReceiver();
 
@@ -226,7 +232,14 @@ public class LoginActivity extends AppCompatActivity {
                     if(success)
                     {
                         String token = datosJson.getString("token");
-                        /// //TODO: Guardar el token para futuro usao
+                        String refreshToken = datosJson.getString("token_refresh");
+
+                        if(!db.existUser(findViewById(R.id.username).toString())){
+                            db.insertUser(findViewById(R.id.username).toString(), refreshToken,token);
+                        }
+                        else{
+                            db.updateLoggedUser(findViewById(R.id.username).toString(), refreshToken,token);
+                        }
                         Toast.makeText(context, "Sesión iniciada correctamente", Toast.LENGTH_SHORT).show();
 
                         Intent mainActivityIntent = new Intent(context, MainActivity.class);
@@ -264,7 +277,15 @@ public class LoginActivity extends AppCompatActivity {
                     if(success)
                     {
                         String token = datosJson.getString("token");
-                        /// //TODO: Guardar el token para futuro usao
+                        String refreshToken = datosJson.getString("token_refresh");
+
+                        if(!db.existUser(findViewById(R.id.username).toString())){
+                            db.insertUser(findViewById(R.id.username).toString(), refreshToken,token);
+                        }
+                        else{
+                            db.updateLoggedUser(findViewById(R.id.username).toString(), refreshToken,token);
+                        }
+
                         Toast.makeText(context, "Sesión iniciada correctamente", Toast.LENGTH_SHORT).show();
 
                         Intent mainActivityIntent = new Intent(context, MainActivity.class);

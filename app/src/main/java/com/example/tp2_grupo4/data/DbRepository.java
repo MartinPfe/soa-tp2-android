@@ -44,12 +44,13 @@ public class DbRepository {
     }
 
     @SuppressLint("Range")
-    public boolean existUser()
+    public boolean existUser(String email)
     {
         Cursor cursor = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
-            cursor = db.rawQuery("SELECT * FROM User ORDER BY LastLogin desc LIMIT 1 ",null);
+            String[] whereArgs = {email};
+            cursor = db.rawQuery("SELECT * FROM User WHERE Email = ? ORDER BY LastLogin desc LIMIT 1 ", whereArgs);
             if(cursor.getCount() > 0) {
                 return true;
             }

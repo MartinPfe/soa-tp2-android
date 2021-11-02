@@ -28,10 +28,6 @@ public class MetricsActivity extends AppCompatActivity {
 
         db = new DbRepository(this);
 
-        db.insertCountryInfection(1,"Argentina" ,1000 );
-        db.insertCountryInfection(1,"Brasil" ,200 );
-        db.insertCountryInfection(1,"Chile" ,3320 );
-
         spinner = (Spinner)findViewById(R.id.spinner);
         lvResults = (ListView)findViewById(R.id.lvResults);
 
