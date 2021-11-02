@@ -15,13 +15,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tp2_grupo4.HttpClient.HttpClient_GET;
+import com.example.tp2_grupo4.data.DbRepository;
 import com.example.tp2_grupo4.data.model.Country;
+import com.example.tp2_grupo4.data.model.User;
 import com.example.tp2_grupo4.services.EventsService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
     private ReceptorOperacionTraerCasos receiverCasos = new ReceptorOperacionTraerCasos();
     private ReceptorBateria receiverBateria = new ReceptorBateria();
 
+    User loggedInUser;
+    DbRepository db;
+
+
     public TextView displayCountryInfoText;
     public TextView covidCasesTextView;
     public TextView batteryLvlTextView;
@@ -46,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+         db = new DbRepository(this);
+         loggedInUser = db.getLoggedUser();
+
 
         final Button getCountryButton = findViewById(R.id.getCountryButton);
         displayCountryInfoText = findViewById(R.id.displayCountryInfo);
@@ -106,8 +117,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected String getLoggedUserEmail(){
-        //TODO: Obtenerlo desde la base
-        return "martin.pfe@gmail.com";
+        //TODO: sacarlo cuando tengamos el login activo
+//        db.insertUser("noidz@gmail.com", "refreshToken","accessToken");
+
+        return loggedInUser.email != null ? loggedInUser.email : "martin.pfe@gmail.com";
     }
 
     private void configurarBroadcastReceiver()
@@ -153,8 +166,9 @@ public class MainActivity extends AppCompatActivity {
 
                     String countryName = countryJson.getString("Country");
                     String countrySlug = countryJson.getString("Slug");
+                    int countryInfectedQty = Integer.parseInt(countryJson.getString("Active"));
 
-                    currentCountry = new Country(countryName, countrySlug);
+                    currentCountry = new Country(countryName, countrySlug, countryInfectedQty);
 
                     displayCountryInfoText.setText(currentCountry.getName());
 
@@ -184,6 +198,8 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject countryJson = countriesArray.getJSONObject(0);
 
                     String activeCases = countryJson.getString("Active");
+
+                    db.insertCountryInfection(loggedInUser.userId, currentCountry.getName(), Integer.parseInt(activeCases));
 
                     covidCasesTextView.setText(activeCases);
                 }

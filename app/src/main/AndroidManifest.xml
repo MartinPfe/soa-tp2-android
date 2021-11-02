@@ -34,6 +34,7 @@
             android:name=".ui.login.LoginActivity">
         </activity>
         <activity android:name=".MainActivity"></activity>
+        <activity android:name=".ui.metrics.MetricsActivity"></activity>
 
         <service android:name=".HttpClient.HttpCliente_POST" >
         </service>

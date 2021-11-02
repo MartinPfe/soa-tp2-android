@@ -8,12 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.tp2_grupo4.data.model.LoggedUser;
+import com.example.tp2_grupo4.data.model.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 public class DbRepository {
@@ -94,27 +95,27 @@ public class DbRepository {
 //    }
 
     @SuppressLint("Range")
-    public LoggedUser getLoggedUser()
+    public User getLoggedUser()
     {
         Cursor cursor = null;
-        LoggedUser loggedUser = new LoggedUser();
+        User user = new User();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             cursor = db.rawQuery("SELECT * FROM User ORDER BY LastLogin desc LIMIT 1 ",null);
             if(cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                loggedUser.userId = cursor.getInt(cursor.getColumnIndex("Id"));
-                loggedUser.email = cursor.getString(cursor.getColumnIndex("Email"));
-                loggedUser.refreshToken = cursor.getString(cursor.getColumnIndex("RefreshToken"));
-                loggedUser.accessToken = cursor.getString(cursor.getColumnIndex("AccessToken"));
-                loggedUser.lastRefresh = cursor.getLong(cursor.getColumnIndex("LastRefresh"));
-                loggedUser.lastLogin = cursor.getLong(cursor.getColumnIndex("LastLogin"));
+                user.userId = cursor.getInt(cursor.getColumnIndex("Id"));
+                user.email = cursor.getString(cursor.getColumnIndex("Email"));
+                user.refreshToken = cursor.getString(cursor.getColumnIndex("RefreshToken"));
+                user.accessToken = cursor.getString(cursor.getColumnIndex("AccessToken"));
+                user.lastRefresh = cursor.getLong(cursor.getColumnIndex("LastRefresh"));
+                user.lastLogin = cursor.getLong(cursor.getColumnIndex("LastLogin"));
             }
         }finally {
             cursor.close();
         }
 
-        return loggedUser;
+        return user;
     }
 
     public  int deleteUser(String uname)
@@ -136,27 +137,60 @@ public class DbRepository {
         return count;
     }
 
-   //CountryVisited
-    public long insertCountryVisited(String countryName, String userId)
+
+    public long insertLocalCountry(String countryName, int infectedQty)
     {
-        SQLiteDatabase dbb = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("CountryName", countryName);
+        contentValues.put("InfectedQty", infectedQty);
+        long id = db.insert("LocalCountry", null , contentValues);
+        return id;
+    }
+
+    public long getLocalCountry(String countryName, int infectedQty)
+    {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("CountryName", countryName);
+        contentValues.put("InfectedQty", infectedQty);
+        long id = db.insert("LocalCountry", null , contentValues);
+        return id;
+    }
+
+    public long insertCountryInfection(int userId, String countryName, int infectedQty)
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
         contentValues.put("UserId", userId);
-        long id = dbb.insert("CountriesVisited", null , contentValues);
+        contentValues.put("CountryName", countryName);
+        contentValues.put("InfectedQty", infectedQty);
+        contentValues.put("InsDate",dateFormat.format(date));
+
+        long id = db.insert("CountriesInfection", null , contentValues);
         return id;
     }
 
     public List<String> getCountryMoreVisited()
     {
-        List<String> array = new ArrayList<String>();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String[] columns = {"Id","Name","Password"};
-        Cursor cursor =db.rawQuery("SELECT CountryName, COUNT(*) as Counter FROM ActivityCountrySituation GROUP BY CountryName ORDER BY Counter desc LIMIT 5 ",null);
 
-        while(cursor.moveToNext()){
-            @SuppressLint("Range") String data = cursor.getString(cursor.getColumnIndex("CountryName")) + " (" + cursor.getString(cursor.getColumnIndex("Counter"))+ ")" ;
-            array.add(data);
+        List<String> array = new ArrayList<String>();
+        try {
+
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+//        String[] columns = {"Id","Name","Password"};
+            Cursor cursor = db.rawQuery("SELECT CountryName, COUNT(*) as Counter FROM CountriesInfection GROUP BY CountryName ORDER BY COUNT(*) desc LIMIT 5 ", null);
+
+            while (cursor.moveToNext()) {
+                @SuppressLint("Range") String data = cursor.getString(cursor.getColumnIndex("CountryName")) + " (" + cursor.getString(cursor.getColumnIndex("Counter")) + ")";
+                array.add(data);
+            }
+        }
+        catch (Exception ex){
+            Log.println(Log.ERROR,"Error",ex.getMessage());
         }
         return array;
     }
@@ -165,8 +199,7 @@ public class DbRepository {
     {
         List<String> array = new ArrayList<String>();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String[] columns = {"Id","Name","Password"};
-        Cursor cursor =db.rawQuery("SELECT CountryName, InfectedQty FROM CountryVisited ORDER BY InfectedQty desc LIMIT 5 ",null);
+        Cursor cursor =db.rawQuery("SELECT * FROM (SELECT DISTINCT CountryName, InfectedQty FROM CountriesInfection ORDER BY InsDate DESC) ORDER BY InfectedQty asc LIMIT 5 ",null);
 
         while(cursor.moveToNext()){
             @SuppressLint("Range") String data = cursor.getString(cursor.getColumnIndex("CountryName")) + " (" + cursor.getString(cursor.getColumnIndex("InfectedQty"))+ ")" ;
@@ -192,8 +225,8 @@ public class DbRepository {
 
             try {
                 db.execSQL("CREATE TABLE IF NOT EXISTS User (Id INTEGER PRIMARY KEY AUTOINCREMENT, Email VARCHAR(255) UNIQUE, RefreshToken VARCHAR(255), AccessToken VARCHAR(255), LastRefresh DATETIME, LastLogin DATETIME);");
-                db.execSQL("CREATE TABLE IF NOT EXISTS CountriesVisited (Id INTEGER PRIMARY KEY AUTOINCREMENT, CountryName VARCHAR(255), InfectedQty INTEGER, InsDate DATETIME);");
-                db.execSQL("CREATE TABLE IF NOT EXISTS ActivityCountrySituation (Id INTEGER PRIMARY KEY AUTOINCREMENT, UserId INTEGER, CountryName VARCHAR(255), InfectedQty INTEGER);");
+                db.execSQL("CREATE TABLE IF NOT EXISTS LocalCountry (Id INTEGER PRIMARY KEY AUTOINCREMENT, CountryName VARCHAR(255) UNIQUE, InfectedQty INTEGER);");
+                db.execSQL("CREATE TABLE IF NOT EXISTS CountriesInfection (Id INTEGER PRIMARY KEY AUTOINCREMENT, UserId INTEGER, CountryName VARCHAR(255), InfectedQty INTEGER, InsDate DATETIME);");
             } catch (Exception e) {
                 Log.println(Log.ERROR, "ERROR", "Error OnCreate SQLite. ex: " + e.getMessage());
 //                Message.message(context,""+e);
@@ -204,9 +237,9 @@ public class DbRepository {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             try {
 /*                Message.message(context,"OnUpgrade");*/
-                db.execSQL("DROP TABLE IF EXISTS CountriesVisited;");
                 db.execSQL("DROP TABLE IF EXISTS User;");
-                db.execSQL("DROP TABLE IF EXISTS ActivityCountrySituation;");
+                db.execSQL("DROP TABLE IF EXISTS LocalCountry;");
+                db.execSQL("DROP TABLE IF EXISTS CountriesInfection;");
                 onCreate(db);
             }catch (Exception e) {
 //                Message.message(context,""+e);

@@ -12,37 +12,37 @@
     android:orientation="vertical"
     tools:context=".ui.metrics.MetricsActivity">
 
-<!--    <TextView-->
-<!--        android:id="@+id/tvTitle"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textStyle="bold"-->
-<!--        android:textSize="25sp"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:textAlignment="center"-->
-<!--        android:layout_marginBottom="20dp"-->
-<!--        android:text="Métricas"/>-->
-<!--    <TextView-->
-<!--        android:id="@+id/tvSpinner"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textStyle="bold"-->
-<!--        android:textSize="20sp"-->
-<!--        android:text="Parámetro"/>-->
-<!--    <Spinner-->
-<!--        android:id="@+id/spinner"-->
-<!--        android:entries="@array/MetricsParameters"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginBottom="20dp"/>-->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:layout_marginBottom="20dp"
+        android:text="Métricas"/>
+    <TextView
+        android:id="@+id/tvSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:text="Parámetro"/>
+    <Spinner
+        android:id="@+id/spinner"
+        android:entries="@array/MetricsParameters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"/>
 
-<!--    <TextView-->
-<!--        android:id="@+id/tvResults"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textStyle="bold"-->
-<!--        android:textSize="20sp"-->
-<!--        android:text="Resultado"/>-->
+    <ListView
+        android:id="@+id/lvResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:text="Resultado"/>
 
 
 </LinearLayout>
