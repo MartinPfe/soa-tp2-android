@@ -6,9 +6,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private String covid19Uri = "https://api.covid19api.com/";
     public IntentFilter filtroPaises;
@@ -39,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     private ReceptorOperacionTraerPais receiverPaises = new ReceptorOperacionTraerPais();
     private ReceptorOperacionTraerCasos receiverCasos = new ReceptorOperacionTraerCasos();
     private ReceptorBateria receiverBateria = new ReceptorBateria();
+    private boolean IsGetRandomCountryRunning = false;
+
+    private final static float ACC = 15;
+    private final static float LIGHT = 20000;
+    private SensorManager sensor;
 
     User loggedInUser;
     DbRepository db;
@@ -51,6 +61,19 @@ public class MainActivity extends AppCompatActivity {
     public Country currentCountry;
 
     @Override
+    protected void onStop(){
+        super.onStop();
+        unregisterSenser();
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        registerSenser();
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -59,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         loggedInUser = db.getLoggedUser();
 
+        sensor = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         final Button getCountryButton = findViewById(R.id.getCountryButton);
         displayCountryInfoText = findViewById(R.id.displayCountryInfo);
@@ -81,13 +105,30 @@ public class MainActivity extends AppCompatActivity {
         btnMetrics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MetricsActivity.class);
-                startActivity(intent);
+                IrAMetricas();
             }
         });
     }
 
+    private void IrAMetricas() {
+        Intent intent = new Intent(getApplicationContext(), MetricsActivity.class);
+        startActivity(intent);
+    }
+
+    private void registerSenser()
+    {
+        sensor.registerListener(this, sensor.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        sensor.registerListener(this, sensor.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private void unregisterSenser()
+    {
+        sensor.unregisterListener(this, sensor.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+        sensor.unregisterListener(this, sensor.getDefaultSensor(Sensor.TYPE_LIGHT));
+    }
+
     protected void getRandomCountry(){
+        IsGetRandomCountryRunning = true;
         String countriesUri = covid19Uri + "countries";
 
         Intent i = new Intent(MainActivity.this, HttpClient_GET.class);
@@ -147,6 +188,39 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiverBateria, filtroBateria);
     }
 
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event)
+    {
+        int sensorType = event.sensor.getType();
+
+        float[] values = event.values;
+
+        synchronized (this) {
+            Log.d("sensor", event.sensor.getName());
+
+            if (sensorType == Sensor.TYPE_ACCELEROMETER) {
+                if ((Math.abs(values[0]) > ACC || Math.abs(values[1]) > ACC || Math.abs(values[2]) > ACC)) {
+                    if (!IsGetRandomCountryRunning) {
+                        getRandomCountry();
+                    }
+                }
+            }
+
+            if (sensorType == Sensor.TYPE_LIGHT) {
+                if (values[0] > LIGHT) {
+                    IrAMetricas();
+                }
+            }
+        }
+
+    }
+
     public class ReceptorBateria extends BroadcastReceiver
     {
         public void onReceive(Context context, Intent intent) {
@@ -199,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
     {
         public void onReceive(Context context, Intent intent) {
             try {
+                IsGetRandomCountryRunning = false;
+
                 String datosJsonString = intent.getStringExtra("datosJson");
 
                 if(datosJsonString != "NO_OK")
