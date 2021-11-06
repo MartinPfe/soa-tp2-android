@@ -99,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void getCountryCovidStats(){
-        DateFormat df = new DateFormat();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -2);

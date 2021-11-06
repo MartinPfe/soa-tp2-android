@@ -3,6 +3,9 @@ package com.example.tp2_grupo4.HttpClient;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.example.tp2_grupo4.helpers.InternetHelper;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -32,7 +35,25 @@ public class HttpClient_GET extends IntentService
 
     protected void ejecutarGET(String uri, String datosJson, String receiver)
     {
-        String result = GET(uri, datosJson);
+
+        String result = "";
+        if(!InternetHelper.isOnline())
+        {
+            JSONObject objError = new JSONObject();
+
+            try {
+                objError.put("success", false);
+                objError.put("msg", "No hay conexión a intener para realizar la operación");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            result = objError.toString();
+        }
+        else
+        {
+            result = GET(uri, datosJson);
+        }
 
         Intent i = new Intent("com.example.intentservice.intent.action." + receiver);
         i.putExtra("datosJson", result);

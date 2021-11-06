@@ -5,7 +5,11 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.tp2_grupo4.helpers.InternetHelper;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -36,14 +40,34 @@ public class HttpCliente_POST extends IntentService
         ejecutarPost(uri, datosJson, receiver, token);
     }
 
-    protected void ejecutarPost(String uri, String datosJson, String receiver, String token)
+    public void ejecutarPost(String uri, String datosJson, String receiver, String token)
     {
-        String result = POST(uri, datosJson, token);
+        String result = "";
+        if(!InternetHelper.isOnline())
+        {
+            JSONObject objError = new JSONObject();
 
-        Intent i = new Intent("com.example.intentservice.intent.action." + receiver);
-        i.putExtra("datosJson", result);
+            try {
+                objError.put("success", false);
+                objError.put("msg", "No hay conexión a intener para realizar la operación");
+            } catch (JSONException e) {
+                e.printStackTrace();
+           }
 
-        sendBroadcast(i);
+            result = objError.toString();
+        }
+        else
+        {
+            result = POST(uri, datosJson, token);
+        }
+
+        if (receiver != "")
+        {
+            Intent i = new Intent("com.example.intentservice.intent.action." + receiver);
+            i.putExtra("datosJson", result);
+            sendBroadcast(i);
+        }
+
     }
 
 

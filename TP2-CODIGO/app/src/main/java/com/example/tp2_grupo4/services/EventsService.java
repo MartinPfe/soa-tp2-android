@@ -3,10 +3,12 @@ package com.example.tp2_grupo4.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.tp2_grupo4.HttpClient.HttpCliente_POST;
+import com.example.tp2_grupo4.helpers.InternetHelper;
 import com.example.tp2_grupo4.ui.login.LoginActivity;
 
 import org.json.JSONException;
@@ -36,25 +38,26 @@ public class EventsService extends IntentService
         String type = intent.getExtras().getString("type");
         String description = intent.getExtras().getString("description");
 
-        Intent i = new Intent(EventsService.this, HttpCliente_POST.class);
+        //Como este proceso se realiza en background, no mostramos un mensaje a proposito
+        if(!InternetHelper.isOnline())
+        {
+            return;
+        }
+
+        HttpCliente_POST client = new HttpCliente_POST();
 
         JSONObject objEvent = new JSONObject();
         try {
             objEvent.put("type_events", type);
             objEvent.put("description", description);
             //TODO: Cambiar por variables de entorno
-            objEvent.put("env", "PROD");
+            objEvent.put("env", "TEST");
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        i.putExtra("uri", eventsUri);
-        i.putExtra("jsonData", objEvent.toString());
-        i.putExtra("receiver", "RESPUESTA_EVENTO");
-        i.putExtra("token", obtenerToken(email));
-
-        startService(i);
+        client.ejecutarPost(eventsUri, objEvent.toString(), "", obtenerToken(email));
     }
 
     protected String obtenerToken(String email)

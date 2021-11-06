@@ -177,7 +177,7 @@ public class LoginActivity extends AppCompatActivity {
                     //TODO: Cambiar por variables de entorno
                     objRegister.put("commission", 2900);
                     objRegister.put("group", 4);
-                    objRegister.put("env", "PROD");
+                    objRegister.put("env", "TEST");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
