@@ -9,24 +9,25 @@ import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.tp2_grupo4.MainPresenter;
 import com.example.tp2_grupo4.R;
 import com.example.tp2_grupo4.data.DbRepository;
 
 import java.lang.reflect.Array;
 import java.util.List;
 
-public class MetricsActivity extends AppCompatActivity {
+public class MetricsActivity extends AppCompatActivity implements Metrics.View{
 
+    private MetricsPresenter presenter;
     private Spinner spinner;
     private ListView lvResults;
-    DbRepository db;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metrics);
 
-        db = new DbRepository(this);
+        presenter = new MetricsPresenter(this);
 
         spinner = (Spinner)findViewById(R.id.spinner);
         lvResults = (ListView)findViewById(R.id.lvResults);
@@ -38,17 +39,13 @@ public class MetricsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> list, View view, int position, long id) {
                 if(list.getItemAtPosition(position).equals("Los países más buscados")){
-                    List<String> array = db.getCountryMoreVisited();
-
+                    List<String> array = presenter.getCountriesMoreVisitedReport();
                     ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(MetricsActivity.this, android.R.layout.simple_list_item_1, array);
-//                    ArrayAdapter listAdapter = (ArrayAdapter) db.getCountryMoreVisited();
                     lvResults.setAdapter(listAdapter);
                 }
                 else if(list.getItemAtPosition(position).equals("Los países con menos infectados")){
-                    List<String> array = db.getCountriesLessInfected();
-
+                    List<String> array = presenter.getCountriesLessInfectedReport();
                     ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(MetricsActivity.this, android.R.layout.simple_list_item_1, array);
-//                    ArrayAdapter listAdapter = (ArrayAdapter) db.getCountriesLessInfected();
                     lvResults.setAdapter(listAdapter);
                 }
             }

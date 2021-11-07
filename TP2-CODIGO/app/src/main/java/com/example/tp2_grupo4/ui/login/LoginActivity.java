@@ -36,20 +36,24 @@ import com.example.tp2_grupo4.data.DbRepository;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements Login.View {
+
+    private LoginPresenter presenter;
 
     private LoginViewModel loginViewModel;
     public IntentFilter filtroRegistro;
     public IntentFilter filtroLogin;
-    private ReceptorOperacionRegistro receiverRegistro = new ReceptorOperacionRegistro();
-    private ReceptorOperacionLogin receiverLogin = new ReceptorOperacionLogin();
-
-    DbRepository db;
-
+//    private ReceptorOperacionRegistro receiverRegistro = new ReceptorOperacionRegistro();
+//    private ReceptorOperacionLogin receiverLogin = new ReceptorOperacionLogin();
+//
+//    DbRepository db;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        presenter = new LoginPresenter(this);
+
         setContentView(R.layout.activity_login);
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
@@ -60,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         final EditText lastNameEditText = findViewById(R.id.lastname);
         final EditText dniEditText = findViewById(R.id.dni);
 
-        db = new DbRepository(this);
+//        db = new DbRepository(this);
 
         configurarBroadcastReceiver();
 
@@ -148,11 +152,11 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 //TODO: Cambiar por variables de entorno
-                String registerUri = "http://so-unlam.net.ar/api/api/login";
+                String loginUri = presenter.getLoginUri();
 
                 Intent i = new Intent(LoginActivity.this, HttpCliente_POST.class);
 
-                i.putExtra("uri", registerUri);
+                i.putExtra("uri", loginUri);
                 i.putExtra("jsonData", objRegister.toString());
                 i.putExtra("receiver", "RESPUESTA_LOGIN");
 
@@ -174,16 +178,14 @@ public class LoginActivity extends AppCompatActivity {
                     objRegister.put("lastname", lastNameEditText.getText().toString());
                     objRegister.put("dni", dniEditText.getText().toString());
 
-                    //TODO: Cambiar por variables de entorno
-                    objRegister.put("commission", 2900);
-                    objRegister.put("group", 4);
-                    objRegister.put("env", "TEST");
+                    objRegister.put("commission", presenter.getCommission());
+                    objRegister.put("group", presenter.getGroup());
+                    objRegister.put("env", presenter.getEnv());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                //TODO: Cambiar por variables de entorno
-                String registerUri = "http://so-unlam.net.ar/api/api/register";
+                String registerUri = presenter.getRegisterUri();
 
                 Intent i = new Intent(LoginActivity.this, HttpCliente_POST.class);
 
@@ -211,101 +213,11 @@ public class LoginActivity extends AppCompatActivity {
     private void configurarBroadcastReceiver() {
         filtroRegistro = new IntentFilter("com.example.intentservice.intent.action.RESPUESTA_REGISTRO");
         filtroRegistro.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiverRegistro, filtroRegistro);
+        registerReceiver(presenter.getReceiverRegistro(), filtroRegistro);
 
         filtroLogin = new IntentFilter("com.example.intentservice.intent.action.RESPUESTA_LOGIN");
         filtroLogin.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiverLogin, filtroLogin);
-    }
-
-    public class ReceptorOperacionLogin extends BroadcastReceiver
-    {
-        public void onReceive(Context context, Intent intent) {
-            try {
-                String datosJsonString = intent.getStringExtra("datosJson");
-
-                if(datosJsonString != "NO_OK")
-                {
-                    JSONObject datosJson = new JSONObject(datosJsonString);
-                    Boolean success = datosJson.getBoolean("success");
-
-                    if(success)
-                    {
-                        String token = datosJson.getString("token");
-                        String refreshToken = datosJson.getString("token_refresh");
-
-                        if(!db.existUser(findViewById(R.id.username).toString())){
-                            db.insertUser(findViewById(R.id.username).toString(), refreshToken,token);
-                        }
-                        else{
-                            db.updateLoggedUser(findViewById(R.id.username).toString(), refreshToken,token);
-                        }
-                        Toast.makeText(context, "Sesión iniciada correctamente", Toast.LENGTH_SHORT).show();
-
-                        Intent mainActivityIntent = new Intent(context, MainActivity.class);
-                        context.startActivity(mainActivityIntent);
-                    }
-                    else
-                    {
-                        String mensaje = datosJson.getString("msg");
-                        Toast.makeText(context, "Ocurrió un error autenticando al usuario: " + mensaje, Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(context, "Ocurrió un error autenticando al usuario", Toast.LENGTH_SHORT).show();
-                }
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    public class ReceptorOperacionRegistro extends BroadcastReceiver
-    {
-        public void onReceive(Context context, Intent intent) {
-            try {
-                String datosJsonString = intent.getStringExtra("datosJson");
-
-                if(datosJsonString != "NO_OK")
-                {
-                    JSONObject datosJson = new JSONObject(datosJsonString);
-                    Boolean success = datosJson.getBoolean("success");
-
-                    if(success)
-                    {
-                        String token = datosJson.getString("token");
-                        String refreshToken = datosJson.getString("token_refresh");
-
-                        if(!db.existUser(findViewById(R.id.username).toString())){
-                            db.insertUser(findViewById(R.id.username).toString(), refreshToken,token);
-                        }
-                        else{
-                            db.updateLoggedUser(findViewById(R.id.username).toString(), refreshToken,token);
-                        }
-
-                        Toast.makeText(context, "Sesión iniciada correctamente", Toast.LENGTH_SHORT).show();
-
-                        Intent mainActivityIntent = new Intent(context, MainActivity.class);
-                        context.startActivity(mainActivityIntent);
-                    }
-                    else
-                    {
-                        String mensaje = datosJson.getString("msg");
-                        Toast.makeText(context, "Ocurrió un error registrando al usuario: " + mensaje, Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(context, "Ocurrió un error registrando al usuario", Toast.LENGTH_SHORT).show();
-                }
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+        registerReceiver(presenter.getReceiverLogin(), filtroLogin);
     }
 
 }
