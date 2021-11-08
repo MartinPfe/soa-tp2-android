@@ -8,6 +8,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.example.tp2_grupo4.HttpClient.HttpCliente_POST;
+import com.example.tp2_grupo4.R;
+import com.example.tp2_grupo4.data.DbRepository;
+import com.example.tp2_grupo4.data.model.User;
 import com.example.tp2_grupo4.helpers.InternetHelper;
 import com.example.tp2_grupo4.ui.login.LoginActivity;
 
@@ -20,17 +23,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 
 public class EventsService extends IntentService
 {
     private Exception mException=null;
 
-    private String eventsUri = "http://so-unlam.net.ar/api/api/event";
-    private String refreshTokenUri = "http://so-unlam.net.ar/api/api/refresh";
-
     public EventsService() {
         super("EventsService");
     }
+    private DbRepository db = new DbRepository(this);
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -50,33 +52,40 @@ public class EventsService extends IntentService
         try {
             objEvent.put("type_events", type);
             objEvent.put("description", description);
-            //TODO: Cambiar por variables de entorno
-            objEvent.put("env", "TEST");
+            objEvent.put("env", getString(R.string.env_PROD));
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        client.ejecutarPost(eventsUri, objEvent.toString(), "", obtenerToken(email));
+        client.ejecutarPost(getString(R.string.eventsUri), objEvent.toString(), "", obtenerToken(email));
     }
 
     protected String obtenerToken(String email)
     {
-        //TODO: Deshardcodear esto y hacer que lo tenga de la DB
-        String refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzU4MDY4OTgsInR5cGUiOiJyZWZyZXNoIiwidXNlciI6eyJlbWFpbCI6Im1hcnRpbi5wZmVAZ21haWwuY29tIiwiZG5pIjozOTE2NjY2OCwiZ3JvdXAiOjR9fQ.odxTg_in1m33CLmTRHQrYyZc3rLo_DF5toqRZR5fz7g";
-        String token = "";
+        User user = db.getLoggedUser();
+        String userRefreshToken = user.refreshToken;
 
-        String response = PUT(refreshTokenUri, "", refreshToken);
-        //TODO: Cambiar esto para que haga la validación de ver si está vencido
-        Boolean tokenVencido = true;
+        String token = "";
+        String refreshToken = "";
+
+        String response = PUT(getString(R.string.refreshTokenUri), "", userRefreshToken);
+
+        Date date = new Date();
+        Boolean tokenVencido = false;
+        if((date.getTime() - user.lastRefresh) / (60000) > 15){
+            tokenVencido = true;
+        }
 
         if(tokenVencido) {
             if (response != "NO_OK") {
                 try {
                     JSONObject responseJson = new JSONObject(response);
 
-                    //TODO: Guardar el token
                     token = responseJson.getString("token");
+                    refreshToken = responseJson.getString("token_refresh");
+
+                    db.updateLoggedUser(user.email,refreshToken,token);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -43,10 +43,12 @@ public class LoginActivity extends AppCompatActivity implements Login.View {
     private LoginViewModel loginViewModel;
     public IntentFilter filtroRegistro;
     public IntentFilter filtroLogin;
-//    private ReceptorOperacionRegistro receiverRegistro = new ReceptorOperacionRegistro();
-//    private ReceptorOperacionLogin receiverLogin = new ReceptorOperacionLogin();
-//
-//    DbRepository db;
+
+    EditText usernameEditText;
+    EditText passwordEditText;
+    EditText nameEditText;
+    EditText lastNameEditText;
+    EditText dniEditText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,13 +60,12 @@ public class LoginActivity extends AppCompatActivity implements Login.View {
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = findViewById(R.id.username);
-        final EditText passwordEditText = findViewById(R.id.password);
-        final EditText nameEditText = findViewById(R.id.name);
-        final EditText lastNameEditText = findViewById(R.id.lastname);
-        final EditText dniEditText = findViewById(R.id.dni);
+        usernameEditText = findViewById(R.id.username);
+        passwordEditText = findViewById(R.id.password);
+        nameEditText = findViewById(R.id.name);
+        lastNameEditText = findViewById(R.id.lastname);
+        dniEditText = findViewById(R.id.dni);
 
-//        db = new DbRepository(this);
 
         configurarBroadcastReceiver();
 
@@ -151,8 +152,7 @@ public class LoginActivity extends AppCompatActivity implements Login.View {
                     e.printStackTrace();
                 }
 
-                //TODO: Cambiar por variables de entorno
-                String loginUri = presenter.getLoginUri();
+                String loginUri = getString(R.string.loginUri);;
 
                 Intent i = new Intent(LoginActivity.this, HttpCliente_POST.class);
 
@@ -178,14 +178,14 @@ public class LoginActivity extends AppCompatActivity implements Login.View {
                     objRegister.put("lastname", lastNameEditText.getText().toString());
                     objRegister.put("dni", dniEditText.getText().toString());
 
-                    objRegister.put("commission", presenter.getCommission());
-                    objRegister.put("group", presenter.getGroup());
-                    objRegister.put("env", presenter.getEnv());
+                    objRegister.put("commission", getString(R.string.comission));
+                    objRegister.put("group", getString(R.string.group));
+                    objRegister.put("env", getString(R.string.env_PROD));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                String registerUri = presenter.getRegisterUri();
+                String registerUri = getString(R.string.registerUri);
 
                 Intent i = new Intent(LoginActivity.this, HttpCliente_POST.class);
 

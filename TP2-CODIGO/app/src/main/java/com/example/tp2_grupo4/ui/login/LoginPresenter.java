@@ -20,38 +20,12 @@ public class LoginPresenter implements Login.Presenter {
     private ReceptorOperacionLogin receiverLogin = new ReceptorOperacionLogin();
     DbRepository db;
 
-    final int commission = 2900;
-    final int group = 4;
-    final String env = "TEST";
-    final String registerUri = "http://so-unlam.net.ar/api/api/register";
-    final String loginUri = "http://so-unlam.net.ar/api/api/login";
-
     public LoginPresenter(LoginActivity activity){
         this.activity = activity;
 
         db = new DbRepository(this.activity);
 
     }
-    public int getCommission() {
-        return commission;
-    }
-
-    public int getGroup() {
-        return group;
-    }
-
-    public String getEnv() {
-        return env;
-    }
-
-    public String getRegisterUri() {
-        return registerUri;
-    }
-
-    public String getLoginUri() {
-        return loginUri;
-    }
-
 
     public ReceptorOperacionRegistro getReceiverRegistro() {
         return receiverRegistro;
@@ -76,12 +50,13 @@ public class LoginPresenter implements Login.Presenter {
                     {
                         String token = datosJson.getString("token");
                         String refreshToken = datosJson.getString("token_refresh");
+                        String email = activity.usernameEditText.getText().toString();
 
-                        if(!db.existUser(activity.findViewById(R.id.username).toString())){
-                            db.insertUser(activity.findViewById(R.id.username).toString(), refreshToken,token);
+                        if(!db.existUser(email)){
+                            db.insertUser(email, refreshToken,token);
                         }
                         else{
-                            db.updateLoggedUser(activity.findViewById(R.id.username).toString(), refreshToken,token);
+                            db.updateLoggedUser(email, refreshToken,token);
                         }
                         Toast.makeText(context, "Sesión iniciada correctamente", Toast.LENGTH_SHORT).show();
 
@@ -121,12 +96,13 @@ public class LoginPresenter implements Login.Presenter {
                     {
                         String token = datosJson.getString("token");
                         String refreshToken = datosJson.getString("token_refresh");
+                        String email = activity.usernameEditText.getText().toString();
 
-                        if(!db.existUser(activity.findViewById(R.id.username).toString())){
-                            db.insertUser(activity.findViewById(R.id.username).toString(), refreshToken,token);
+                        if(!db.existUser(email)){
+                            db.insertUser(email, refreshToken, token);
                         }
                         else{
-                            db.updateLoggedUser(activity.findViewById(R.id.username).toString(), refreshToken,token);
+                            db.updateLoggedUser(email, refreshToken, token);
                         }
 
                         Toast.makeText(context, "Sesión iniciada correctamente", Toast.LENGTH_SHORT).show();

@@ -18,6 +18,14 @@
     <string name="fingerprint_instructions">
     Ingresá la huella digital para continuar a la aplicación
     </string>
+    <string name="comission">2900</string>
+    <string name="group">4</string>
+    <string name="env_TEST">TEST</string>
+    <string name="env_PROD">PROD</string>
+    <string name="registerUri">http://so-unlam.net.ar/api/api/register</string>
+    <string name="loginUri">http://so-unlam.net.ar/api/api/login</string>
+    <string name="eventsUri">http://so-unlam.net.ar/api/api/event</string>
+    <string name="refreshTokenUri">http://so-unlam.net.ar/api/api/refresh</string>
     <string-array name="MetricsParameters">
         <item>Los países más buscados</item>
         <item>Los países con menos infectados</item>

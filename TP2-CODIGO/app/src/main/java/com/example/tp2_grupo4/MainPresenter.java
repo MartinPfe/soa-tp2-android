@@ -143,7 +143,6 @@ public class MainPresenter implements Main.Presenter, SensorEventListener{
         db = new DbRepository(this.activity);
         loggedInUser = db.getLoggedUser();
         sensor = (SensorManager) this.activity.getSystemService(SENSOR_SERVICE);
-//        registerEvent("Login", "Un usuario inicio sesion");
     }
 
     public class ReceptorBateria extends BroadcastReceiver
@@ -174,7 +173,6 @@ public class MainPresenter implements Main.Presenter, SensorEventListener{
 
                     String countryName = countryJson.getString("Country");
                     String countrySlug = countryJson.getString("Slug");
-                    //int countryInfectedQty = Integer.parseInt(countryJson.getString("Active"));
 
                     currentCountry = new Country(countryName, countrySlug);
 

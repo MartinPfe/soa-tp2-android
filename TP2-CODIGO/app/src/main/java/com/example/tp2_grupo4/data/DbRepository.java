@@ -10,10 +10,14 @@ import android.util.Log;
 
 import com.example.tp2_grupo4.data.model.User;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 
@@ -79,22 +83,6 @@ public class DbRepository {
         return count;
     }
 
-//    public LoggedUser getUser()
-//    {
-//        SQLiteDatabase db = dbHelper.getWritableDatabase();
-//        String[] columns = {"Id","Name","Password"};
-//        Cursor cursor =db.query("User",columns,null,null,null,null,null);
-//        StringBuffer buffer= new StringBuffer();
-//        while (cursor.moveToNext())
-//        {
-//            @SuppressLint("Range") int cid = cursor.getInt(cursor.getColumnIndex("Id"));
-//            @SuppressLint("Range") String name =cursor.getString(cursor.getColumnIndex("Name"));
-//            @SuppressLint("Range") String  password =cursor.getString(cursor.getColumnIndex("Password"));
-//            buffer.append(cid+ "-" + name + "-" + password +" \n");
-//        }
-//        return buffer.toString();
-//    }
-
     @SuppressLint("Range")
     public User getLoggedUser()
     {
@@ -109,10 +97,21 @@ public class DbRepository {
                 user.email = cursor.getString(cursor.getColumnIndex("Email"));
                 user.refreshToken = cursor.getString(cursor.getColumnIndex("RefreshToken"));
                 user.accessToken = cursor.getString(cursor.getColumnIndex("AccessToken"));
-                user.lastRefresh = cursor.getLong(cursor.getColumnIndex("LastRefresh"));
-                user.lastLogin = cursor.getLong(cursor.getColumnIndex("LastLogin"));
+                //DATES
+                String lastRefreshString = cursor.getString(cursor.getColumnIndex("LastRefresh"));
+                Calendar lastRefreshDate = new GregorianCalendar();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                lastRefreshDate.setTime(sdf.parse(lastRefreshString));
+                user.lastRefresh = lastRefreshDate.getTimeInMillis();
+
+                String lastLoginString = cursor.getString(cursor.getColumnIndex("LastRefresh"));
+                Calendar lastLoginDate = new GregorianCalendar();
+                lastLoginDate.setTime(sdf.parse(lastLoginString));
+                user.lastLogin = lastLoginDate.getTimeInMillis();
             }
-        }finally {
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } finally {
             cursor.close();
         }
 
@@ -182,7 +181,6 @@ public class DbRepository {
         try {
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-//        String[] columns = {"Id","Name","Password"};
             Cursor cursor = db.rawQuery("SELECT CountryName, COUNT(*) as Counter FROM CountriesInfection GROUP BY CountryName ORDER BY COUNT(*) desc LIMIT 5 ", null);
 
             while (cursor.moveToNext()) {
