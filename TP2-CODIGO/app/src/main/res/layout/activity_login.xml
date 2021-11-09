@@ -21,11 +21,9 @@
         android:hint="@string/prompt_email"
         android:inputType="textEmailAddress"
         android:selectAllOnFocus="true"
-        android:text="martin.pfe@gmail.com"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="martin.pfe@gmail.com" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/name"
@@ -83,16 +81,14 @@
         android:imeOptions="actionDone"
         android:inputType="textPassword"
         android:selectAllOnFocus="true"
-        android:text="123456789"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username"
-        tools:text="123456789" />
+        app:layout_constraintTop_toBottomOf="@+id/username" />
 
     <Button
         android:id="@+id/register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="137dp"
+        android:layout_height="58dp"
         android:layout_gravity="start"
         android:layout_marginStart="48dp"
         android:layout_marginTop="16dp"
@@ -109,8 +105,8 @@
 
     <Button
         android:id="@+id/login"
-        android:layout_width="119dp"
-        android:layout_height="49dp"
+        android:layout_width="128dp"
+        android:layout_height="57dp"
         android:layout_gravity="start"
         android:layout_marginStart="48dp"
         android:layout_marginTop="16dp"
