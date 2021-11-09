@@ -31,7 +31,6 @@ public class DbRepository {
     public long insertUser(String email, String refreshToken, String accessToken)
     {
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -39,8 +38,8 @@ public class DbRepository {
         contentValues.put("Email", email);
         contentValues.put("RefreshToken", refreshToken);
         contentValues.put("AccessToken", accessToken);
-        contentValues.put("LastRefresh", dateFormat.format(date));
-        contentValues.put("LastLogin", dateFormat.format(date));
+        contentValues.put("LastRefresh", date.getTime());
+        contentValues.put("LastLogin", date.getTime());
 
         long id = db.insert("User", null , contentValues);
 
@@ -67,15 +66,14 @@ public class DbRepository {
     public int updateLoggedUser(String email, String refreshToken, String accessToken)
     {
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
         contentValues.put("RefreshToken",refreshToken);
         contentValues.put("AccessToken",accessToken);
-        contentValues.put("LastRefresh",dateFormat.format(date));
-        contentValues.put("LastLogin",dateFormat.format(date));
+        contentValues.put("LastRefresh", date.getTime());
+        contentValues.put("LastLogin", date.getTime());
 
         String[] whereArgs= {email};
         int count = db.update("User",contentValues, "Email = ?", whereArgs);
@@ -98,18 +96,10 @@ public class DbRepository {
                 user.refreshToken = cursor.getString(cursor.getColumnIndex("RefreshToken"));
                 user.accessToken = cursor.getString(cursor.getColumnIndex("AccessToken"));
                 //DATES
-                String lastRefreshString = cursor.getString(cursor.getColumnIndex("LastRefresh"));
-                Calendar lastRefreshDate = new GregorianCalendar();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                lastRefreshDate.setTime(sdf.parse(lastRefreshString));
-                user.lastRefresh = lastRefreshDate.getTimeInMillis();
-
-                String lastLoginString = cursor.getString(cursor.getColumnIndex("LastRefresh"));
-                Calendar lastLoginDate = new GregorianCalendar();
-                lastLoginDate.setTime(sdf.parse(lastLoginString));
-                user.lastLogin = lastLoginDate.getTimeInMillis();
+                user.lastRefresh = cursor.getLong(cursor.getColumnIndex("LastRefresh"));
+                user.lastLogin = cursor.getLong(cursor.getColumnIndex("LastLogin"));
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             cursor.close();

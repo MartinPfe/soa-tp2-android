@@ -160,8 +160,6 @@ public class LoginActivity extends AppCompatActivity implements Login.View {
                 i.putExtra("jsonData", objRegister.toString());
                 i.putExtra("receiver", "RESPUESTA_LOGIN");
 
-                Log.e("1", "Antes de llamar");
-
                 startService(i);
             }
         });
@@ -180,7 +178,7 @@ public class LoginActivity extends AppCompatActivity implements Login.View {
 
                     objRegister.put("commission", getString(R.string.comission));
                     objRegister.put("group", getString(R.string.group));
-                    objRegister.put("env", getString(R.string.env_PROD));
+                    objRegister.put("env", getString(R.string.env));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -20,8 +20,7 @@
     </string>
     <string name="comission">2900</string>
     <string name="group">4</string>
-    <string name="env_TEST">TEST</string>
-    <string name="env_PROD">PROD</string>
+    <string name="env">PROD</string>
     <string name="registerUri">http://so-unlam.net.ar/api/api/register</string>
     <string name="loginUri">http://so-unlam.net.ar/api/api/login</string>
     <string name="eventsUri">http://so-unlam.net.ar/api/api/event</string>

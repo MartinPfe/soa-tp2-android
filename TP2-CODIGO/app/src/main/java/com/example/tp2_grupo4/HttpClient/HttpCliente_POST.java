@@ -91,7 +91,6 @@ public class HttpCliente_POST extends IntentService
 
             DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream ());
 
-            JSONObject obj = new JSONObject();
 
             wr.writeBytes(jsonData);
 

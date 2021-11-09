@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class EventsService extends IntentService
 {
@@ -36,7 +37,6 @@ public class EventsService extends IntentService
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        String email = intent.getExtras().getString("email");
         String type = intent.getExtras().getString("type");
         String description = intent.getExtras().getString("description");
 
@@ -52,38 +52,39 @@ public class EventsService extends IntentService
         try {
             objEvent.put("type_events", type);
             objEvent.put("description", description);
-            objEvent.put("env", getString(R.string.env_PROD));
+            objEvent.put("env", getString(R.string.env));
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        client.ejecutarPost(getString(R.string.eventsUri), objEvent.toString(), "", obtenerToken(email));
+        client.ejecutarPost(getString(R.string.eventsUri), objEvent.toString(), "", obtenerToken());
     }
 
-    protected String obtenerToken(String email)
+    protected String obtenerToken()
     {
         User user = db.getLoggedUser();
         String userRefreshToken = user.refreshToken;
-
-        String token = "";
-        String refreshToken = "";
-
-        String response = PUT(getString(R.string.refreshTokenUri), "", userRefreshToken);
+        String token = user.accessToken;
 
         Date date = new Date();
         Boolean tokenVencido = false;
-        if((date.getTime() - user.lastRefresh) / (60000) > 15){
+
+        //Lo hacemos con un minuto menos por si justo llegamos a los 15 mientras procemos lo que queda
+          if(TimeUnit.MILLISECONDS.toMinutes(Math.abs(date.getTime() - user.lastRefresh)) > 14){
             tokenVencido = true;
         }
 
         if(tokenVencido) {
+
+            String response = PUT(getString(R.string.refreshTokenUri), "", userRefreshToken);
+
             if (response != "NO_OK") {
                 try {
                     JSONObject responseJson = new JSONObject(response);
 
                     token = responseJson.getString("token");
-                    refreshToken = responseJson.getString("token_refresh");
+                    String refreshToken = responseJson.getString("token_refresh");
 
                     db.updateLoggedUser(user.email,refreshToken,token);
 

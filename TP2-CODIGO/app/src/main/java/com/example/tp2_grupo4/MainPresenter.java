@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.tp2_grupo4.data.DbRepository;
 import com.example.tp2_grupo4.data.model.Country;
 import com.example.tp2_grupo4.data.model.User;
+import com.example.tp2_grupo4.services.EventsService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -143,6 +144,8 @@ public class MainPresenter implements Main.Presenter, SensorEventListener{
         db = new DbRepository(this.activity);
         loggedInUser = db.getLoggedUser();
         sensor = (SensorManager) this.activity.getSystemService(SENSOR_SERVICE);
+
+        registerEvent("Pantallas", "Un usuario entro a la activity principal");
     }
 
     public class ReceptorBateria extends BroadcastReceiver
@@ -209,6 +212,8 @@ public class MainPresenter implements Main.Presenter, SensorEventListener{
 
                     db.insertCountryInfection(loggedInUser.userId, currentCountry.getName(), Integer.parseInt(activeCases));
 
+                    registerEvent("ConsultaCovid", "Se obtuvo la respuesta de " + currentCountry.getName() + " con " + activeCases + " casos.");
+
                     activity.covidCasesTextView.setText(activeCases);
                 }
                 else
@@ -220,6 +225,16 @@ public class MainPresenter implements Main.Presenter, SensorEventListener{
                 e.printStackTrace();
             }
         }
+    }
+
+
+    protected void registerEvent(String type, String description){
+        Intent i = new Intent(activity, EventsService.class);
+
+        i.putExtra("type", type);
+        i.putExtra("description", description);
+
+        activity.startService(i);
     }
 
 }
